@@ -65,15 +65,23 @@ public abstract class ProximityReceiver extends BroadcastReceiver {
         String key = LocationManager.KEY_PROXIMITY_ENTERING;
 
         Boolean entering = intent.getBooleanExtra(key, false);
-        if (entering) {
-            Log.d(getClass().getSimpleName(), "entering");
+
+        Boolean test = true;
+        if (test) {
+            Log.d(getClass().getSimpleName(), "entering " + intent.getStringExtra("where"));
             onProximityEvent(intent.getStringExtra("where"), true);
             Toast.makeText(mContext, "You are entering", Toast.LENGTH_LONG).show();
-        }
-        else {
-            Log.d(getClass().getSimpleName(), "exiting");
-            onProximityEvent(intent.getStringExtra("where"), true);
-            Toast.makeText(mContext, "You are exiting", Toast.LENGTH_LONG).show();;
+        } else {
+            if (entering) {
+                Log.d(getClass().getSimpleName(), "entering");
+                onProximityEvent(intent.getStringExtra("where"), true);
+                Toast.makeText(mContext, "You are entering", Toast.LENGTH_LONG).show();
+            } else {
+                Log.d(getClass().getSimpleName(), "exiting");
+                onProximityEvent(intent.getStringExtra("where"), false);
+                Toast.makeText(mContext, "You are exiting", Toast.LENGTH_LONG).show();
+                ;
+            }
         }
 
         //sendNotification(context);

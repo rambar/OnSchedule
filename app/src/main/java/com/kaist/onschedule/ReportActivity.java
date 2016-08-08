@@ -305,208 +305,243 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                         isDeparture[CLOSE] = false;
                         isDeparture[FAR] = true;
                     }
-                } else if (where.contains(WHERE_ROUTE)) {
+                } else {
+                    if (where.contains(WHERE_ROUTE)) {
 
-                    where = where.replaceAll("\\D+","");
-                    //where = "5";
-                    Intent removeintent = new Intent();
-                    PendingIntent premoveintent = PendingIntent.getBroadcast(ReportActivity.this, Integer.valueOf(where) - 1, removeintent, 0);
-                    if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    locationManager.removeProximityAlert(premoveintent);
+                        where = where.replaceAll("\\D+", "");
+                        //where = "5";
+                        Intent removeintent = new Intent();
+                        PendingIntent premoveintent = PendingIntent.getBroadcast(ReportActivity.this, Integer.valueOf(where) - 1, removeintent, 0);
+                        if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
+                        locationManager.removeProximityAlert(premoveintent);
 
-                    if(!where.isEmpty()) {
+                        if (!where.isEmpty()) {
 
-                        if (close) {
-                            isRoute[Integer.valueOf(where) - 1][CLOSE] = true;
-                            isRoute[Integer.valueOf(where) - 1][FAR] = false;
+                            if (close) {
+                                isRoute[Integer.valueOf(where) - 1][CLOSE] = true;
+                                isRoute[Integer.valueOf(where) - 1][FAR] = false;
 
-                            SubWayNameIDDataBase subwaydb = new SubWayNameIDDataBase(getBaseContext(), null, null, 1);
-                            SubwayNameIDInfo subwayNameIDInfo = new SubwayNameIDInfo();
+                                SubWayNameIDDataBase subwaydb = new SubWayNameIDDataBase(getBaseContext(), null, null, 1);
+                                SubwayNameIDInfo subwayNameIDInfo = new SubwayNameIDInfo();
 
-                            String[] subwaydbid  = {"", "", "", ""}; //동일 이름의 여러 노선의 ID 가 다르므로 4개로 설정
-                            int i = 0;
-                            int l = 0;
 
-                            do {
+                                String[] subwaydbid = {"", "", "", ""}; //동일 이름의 여러 노선의 ID 가 다르므로 4개로 설정
+                                String[] arrivalTime = {"", "", "", ""}; // 몇 분 몇 초 후
+                                int i = 0;
+                                int l = 0;
+                                if (!mRouteArray[Integer.valueOf(where) - 1][2].contains("Empty")) {
+                                    do {
 
-                                subwayNameIDInfo = subwaydb.getEachRowOfSubwayNameIDDatabase(i);
+                                        subwayNameIDInfo = subwaydb.getEachRowOfSubwayNameIDDatabase(i);
 
-                                Log.i(TAG, "mRouteArray[" + (Integer.valueOf(where) - 1) + "][2]=" + mRouteArray[Integer.valueOf(where) - 1][2] + "subwayNameIDInfo.getName()=" + subwayNameIDInfo.getName());
-                                if (subwayNameIDInfo.getName() != null && subwayNameIDInfo.getName().contains(mRouteArray[Integer.valueOf(where) - 1][2])) {
-                                    if(l < subwaydbid.length) {
-                                        subwaydbid[l] = subwayNameIDInfo.getSubwayid();
-                                    }
-                                    l++;
-                                }
-                                i++;
-                            } while (!subwaydb.isGetDBFinish());
-                            i = 0;
+                                        Log.i(TAG, "mRouteArray[" + (Integer.valueOf(where) - 1) + "][2]=" + mRouteArray[Integer.valueOf(where) - 1][2] + "subwayNameIDInfo.getName()=" + subwayNameIDInfo.getName());
+                                        if (subwayNameIDInfo.getName() != null && subwayNameIDInfo.getName().contains(mRouteArray[Integer.valueOf(where) - 1][2])) {
+                                            if (l < subwaydbid.length) {
+                                                subwaydbid[l] = subwayNameIDInfo.getSubwayid();
+                                                Log.i(TAG, "지하철역명=" + subwayNameIDInfo.getName() + " 지하철역ID=" + subwayNameIDInfo.getSubwayid() + "subwaydbid["+ l + "]=" + subwaydbid[l]);
+                                            }
+                                            l++;
+                                        }
+                                        i++;
+                                    } while (!subwaydb.isGetDBFinish());
+                                    i = 0;
 
-                            JSONManager json = new JSONManager(getBaseContext());
-                            SubwayInfo[] subwayInfoArray;
-                            //matcher = pattern.matcher(mRouteArray[selection][0]);
-                            //json.getJSONDATA(mRouteArray[selection][2], false);
-                            json.getJSONDATA(mRouteArray[Integer.valueOf(where) - 1][0], false);
-                            subwayInfoArray = json.getSubwayJSONInfo();
+                                    JSONManager json = new JSONManager(getBaseContext());
+                                    SubwayInfo[] subwayInfoArray;
+                                    //matcher = pattern.matcher(mRouteArray[selection][0]);
+                                    //json.getJSONDATA(mRouteArray[selection][2], false);
+                                    json.getJSONDATA(mRouteArray[Integer.valueOf(where) - 1][0], false);
+                                    subwayInfoArray = json.getSubwayJSONInfo();
 
-                            String[]  arrivalTime = {"", "", "", ""}; // 몇 분 몇 초 후
-                            String updn = "";
-                            int k = 0;
-                            for(int j = 0 ; j < subwayInfoArray.length ; j++) {
+
+                                    String updn = "";
+                                    int k = 0;
+                                    for (int j = 0; j < subwayInfoArray.length; j++) {
 
                             /* 경유지의 다음 전철역 정보에 해당하는 JSON 정보의 도착 정보 가져오기 */
-                                Log.i(TAG, "subwayInfoArray[" + j + "].getStatnTid()=" + subwayInfoArray[j].getStatnTid() + " subwaydbid=" + subwaydbid[j] + " subwayInfoArray[j].getBarvlDt()=" + subwayInfoArray[j].getBarvlDt());
+                                    Log.i(TAG, "subwayInfoArray[" + j + "].getStatnId()=" + subwayInfoArray[j].getStatnId() + " subwaydbid=" + subwaydbid[j] +
+                                            " subwayInfoArray[j].getBarvlDt()=" + subwayInfoArray[j].getBarvlDt());
 
 
-                                if (subwaydbid[0].isEmpty() && subwaydbid[1].isEmpty() && subwaydbid[2].isEmpty() && subwaydbid[3].isEmpty()) {
-                                    Log.i(TAG, "No Subway ID information");
+                                        if (subwaydbid[0].isEmpty() && subwaydbid[1].isEmpty() && subwaydbid[2].isEmpty() && subwaydbid[3].isEmpty()) {
+                                            Log.i(TAG, "No Subway ID information");
+                                        } else {
+                                            Log.i(TAG, "subwaydbid.length=" + subwaydbid.length);
+                                            for (l = 0; l < subwaydbid.length; l++) {
+                                                int sub;
+                                                Log.i(TAG, "subwaydbid[" + l + "]=" + subwaydbid[l] + " subwayInfoArray[j].getStatnId()=" + subwayInfoArray[j].getStatnId());
+                                                if (!subwaydbid[l].isEmpty() && !subwayInfoArray[j].getStatnId().isEmpty()) {
+                                                    Log.i(TAG, "subwaydbid[" + l + "]=" + subwaydbid[l] + "subwayInfoArray[" + j + "].getStatnId()=" + subwayInfoArray[j].getStatnId());
+                                                    sub = Integer.valueOf(subwayInfoArray[j].getStatnId()) - Integer.valueOf(subwaydbid[l]);
+                                                    index = l;
+                                                    //subwaydbid[index] = subwayInfoArray[j].getStatnTid();
+                                                    if (sub == 1) {
+                                                        Log.i(TAG, "**************subwaydbid[" + l + "]=" + subwaydbid[l] + "subwayInfoArray[" + j + "].getStatnId()=" + subwayInfoArray[j].getStatnId());
+                                                        updn = "상행";
+                                                        break;
+                                                    } else if (sub == -1) {
+                                                        updn = "하행";
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            l = 0;
+                                        }
+
+                                        //if((!subwaydbid[index].isEmpty() && subwayInfoArray[j].getStatnTid().contains(subwaydbid[index]) && subwayInfoArray[j].getArvlMsg3().contains(updn))) {
+                                        if ((!subwaydbid[index].isEmpty() && subwayInfoArray[j].getArvlMsg3().contains(updn))) {
+                                            Log.i(TAG, "k=" + k + "order.length=" + order.length);
+                                            if (k < order.length) {
+                                                Log.i(TAG, "write text view" + k);
+                                                tvReport.append("The " + order[k] + " subway for " + mRouteArray[Integer.valueOf(where) - 1][2]);
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                    tvReport.append(System.lineSeparator());
+                                                }
+
+                                                int min = Integer.valueOf(subwayInfoArray[j].getBarvlDt()) / 60;
+                                                int sec = Integer.valueOf(subwayInfoArray[j].getBarvlDt()) % 60;
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append(String.valueOf(min));
+                                                sb.append("분 ");
+                                                sb.append(String.valueOf(sec));
+                                                sb.append("초 후");
+                                                if (isLeadingDigit(subwayInfoArray[j].getArvlMsg2())) {
+                                                    tvReport.append(" might arrive after " + subwayInfoArray[j].getArvlMsg2());
+                                                } else {
+                                                    tvReport.append(" might arrive after " + sb);
+                                                }
+                                                if (enableTTS) {
+                                                    Log.i(TAG, "TTS Client");
+                                                    if (isLeadingDigit(subwayInfoArray[j].getArvlMsg2())) {
+                                                        ttsClient.setSpeechText(order[k] + mRouteArray[Integer.valueOf(where) - 1][2] + "향 열차가 " + subwayInfoArray[j].getArvlMsg2() + "에 도착합니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                    } else {
+                                                        ttsClient.setSpeechText(order[k] + mRouteArray[Integer.valueOf(where) - 1][2] + "향 열차가 " + sb + "에 도착합니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                    }
+                                                    ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                    try {
+                                                        sleep(SLEEP_SHORT);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                    tvReport.append(System.lineSeparator());
+                                                    tvReport.append(System.lineSeparator());
+                                                }
+                                                svReport.fullScroll(View.FOCUS_DOWN);
+                                                arrivalTime[k] = subwayInfoArray[j].getBarvlDt();
+                                                k++;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Log.i(TAG, "mSchedInfo.get_time()=" + mSchedInfo.get_time());
+
+                                String[] time = mSchedInfo.get_time().split(":");
+                                int schedhour = Integer.valueOf(time[0]);
+                                int schedmin = Integer.valueOf(time[1]);
+                                Calendar cal = Calendar.getInstance();
+                                int currminute = cal.get(Calendar.MINUTE);
+                                //12 hour format
+                                int currhour = cal.get(Calendar.HOUR);
+                                //24 hour format
+                                int currhourofday = cal.get(Calendar.HOUR_OF_DAY);
+
+                                int timediff = 0;
+                                int timediffmin = 0;
+                                int timediffhour = 0;
+                                if (schedmin < currminute) {
+                                    timediffmin = 60 - (currminute - schedmin);
+                                    if (schedhour > currhourofday) {
+                                        timediffhour = schedhour - currhourofday - 1;
+                                    }
                                 } else {
-                                    for (l = 0; l < subwaydbid.length; l++) {
-                                        int sub;
-                                        if (!subwaydbid[l].isEmpty() && !subwayInfoArray[j].getStatnTid().isEmpty()) {
-                                            Log.i(TAG, "subwaydbid[" + l + "]=" + subwaydbid[l] + "subwayInfoArray[" + j + "].getStatnTid()=" + subwayInfoArray[j].getStatnTid());
-                                            sub = Integer.valueOf(subwaydbid[l]) - Integer.valueOf(subwayInfoArray[j].getStatnTid());
-                                            index = l;
-                                            //subwaydbid[index] = subwayInfoArray[j].getStatnTid();
-                                            if (sub == 0) {
-                                                Log.i(TAG, "**************subwaydbid[" + l + "]=" + subwaydbid[l] + "subwayInfoArray[" + j + "].getStatnTid()=" + subwayInfoArray[j].getStatnTid());
-                                                updn = "하행";
-                                                break;
-                                            } else if ((0 < sub && sub < 3) || (0 > sub && sub > -3)) {
-                                                updn = "상행";
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    l = 0;
-                                }
-
-                                //if((!subwaydbid[index].isEmpty() && subwayInfoArray[j].getStatnTid().contains(subwaydbid[index]) && subwayInfoArray[j].getArvlMsg3().contains(updn))) {
-                                if((!subwaydbid[index].isEmpty() && subwayInfoArray[j].getArvlMsg3().contains(updn))) {
-                                    Log.i(TAG, "k=" + k + "order.length=" + order.length);
-                                    if(k < order.length) {
-                                        Log.i(TAG, "write text view" + k);
-                                        tvReport.append("The " + order[k] + " subway for " + mRouteArray[Integer.valueOf(where) - 1][2]);
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                            tvReport.append(System.lineSeparator());
-                                        }
-                                        tvReport.append(" might arrive after " + subwayInfoArray[j].getArvlMsg2());
-                                        if(enableTTS) {
-                                            Log.i(TAG, "TTS Client");
-                                            ttsClient.setSpeechText(order[k] + mRouteArray[Integer.valueOf(where) - 1][2] + "향 열차가 " + subwayInfoArray[j].getArvlMsg2() + "에 도착합니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
-                                            ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                                            try {
-                                                sleep(SLEEP_SHORT);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                            tvReport.append(System.lineSeparator());
-                                            tvReport.append(System.lineSeparator());
-                                        }
-                                        svReport.fullScroll(View.FOCUS_DOWN);
-                                        arrivalTime[k] = subwayInfoArray[j].getBarvlDt();
-                                        k++;
+                                    timediffmin = schedmin - currminute;
+                                    if (schedhour > currhourofday) {
+                                        timediffhour = schedhour - currhourofday;
                                     }
                                 }
-                            }
+                                timediff = timediffhour * 60 * 60 * 1000 + timediffmin * 60 * 1000; //남은 시간
 
-                            Log.i(TAG, "mSchedInfo.get_time()=" + mSchedInfo.get_time());
-
-                            String[] time = mSchedInfo.get_time().split(":");
-                            int schedhour = Integer.valueOf(time[0]);
-                            int schedmin = Integer.valueOf(time[1]);
-                            Calendar cal = Calendar.getInstance();
-                            int currminute = cal.get(Calendar.MINUTE);
-                            //12 hour format
-                            int currhour = cal.get(Calendar.HOUR);
-                            //24 hour format
-                            int currhourofday = cal.get(Calendar.HOUR_OF_DAY);
-
-                            int timediff = 0;
-                            int timediffmin = 0;
-                            int timediffhour = 0;
-                            if (schedmin < currminute) {
-                                timediffmin = 60 - (currminute - schedmin);
-                                if (schedhour > currhourofday) {
-                                    timediffhour = schedhour - currhourofday - 1;
-                                }
-                            } else {
-                                timediffmin = schedmin - currminute;
-                                if (schedhour > currhourofday) {
-                                    timediffhour = schedhour - currhourofday;
-                                }
-                            }
-                            timediff = timediffhour * 60 * 60 * 1000 + timediffmin * 60 * 1000;
-
-                            long firstDifference = 0;
-                            long secondDifference = 0;
-                            if(!mRouteArray[Integer.valueOf(where) - 1][2].contains("Empty")) {
+                                long firstDifference = 0;
+                                long secondDifference = 0;
+                                /* 목적지 또는 경유지 까지 소요 시간 */
+                                long requiredtime = 0;
+                                if (!mRouteArray[Integer.valueOf(where) - 1][2].contains("Empty")) {
 
                                 /* 첫번째 지하철 도착 예정 시간 */
-                                Log.i(TAG, " arrivalTime[0]=" + arrivalTime[0]);
-                                String[] firstArrTime = arrivalTime[0].split("\\s+");
-                                long firstMillisecArrivalTime = 0;
-                                if (firstArrTime.length == 2) {
-                                    firstArrTime[1] = firstArrTime[1].replaceAll("\\D+", ""); //초
-                                    firstArrTime[0] = firstArrTime[0].replaceAll("\\D+", ""); //분
-                                    if(!firstArrTime[0].isEmpty() && !firstArrTime[1].isEmpty()) {
-                                        firstMillisecArrivalTime = Integer.valueOf(firstArrTime[1]) * 1000 + Integer.valueOf(firstArrTime[0]) * 60 * 1000;
-                                    }
-                                } else if (firstArrTime.length == 1) {
-                                    firstArrTime[0] = firstArrTime[0].replaceAll("\\D+", ""); //초
-                                    if (!firstArrTime[0].isEmpty()) {
-                                        firstMillisecArrivalTime = Integer.valueOf(firstArrTime[0]) * 1000;
+                                    Log.i(TAG, " arrivalTime[0]=" + arrivalTime[0]);
+                                    String[] firstArrTime = arrivalTime[0].split("\\s+");
+                                    long firstMillisecArrivalTime = 0;
+                                    if (firstArrTime.length == 2) {
+                                        firstArrTime[1] = firstArrTime[1].replaceAll("\\D+", ""); //초
+                                        firstArrTime[0] = firstArrTime[0].replaceAll("\\D+", ""); //분
+                                        if (!firstArrTime[0].isEmpty() && !firstArrTime[1].isEmpty()) {
+                                            firstMillisecArrivalTime = Integer.valueOf(firstArrTime[1]) * 1000 + Integer.valueOf(firstArrTime[0]) * 60 * 1000;
+                                        }
+                                    } else if (firstArrTime.length == 1) {
+                                        firstArrTime[0] = firstArrTime[0].replaceAll("\\D+", ""); //초
+                                        if (!firstArrTime[0].isEmpty()) {
+                                            firstMillisecArrivalTime = Integer.valueOf(firstArrTime[0]) * 1000;
+                                        }
+
                                     }
 
-                                }
-
-                                firstDifference = timediff - firstMillisecArrivalTime;
+                                    //firstDifference = timediff - firstMillisecArrivalTime; // before
+                                    firstDifference = timediff + firstMillisecArrivalTime; // after
 
                                  /* 두번째 지하철 도착 예정 시간 */
-                                Log.i(TAG, " arrivalTime[1]=" + arrivalTime[1]);
-                                String[] secondArrTime = arrivalTime[1].split("\\s+");
-                                long secondMillisecArrivalTime = 0;
-                                if (secondArrTime.length == 2) {
-                                    secondArrTime[1] = secondArrTime[1].replaceAll("\\D+", ""); //초
-                                    secondArrTime[0] = secondArrTime[0].replaceAll("\\D+", ""); //분
-                                    if(!secondArrTime[0].isEmpty() && !secondArrTime[1].isEmpty()) {
-                                        secondMillisecArrivalTime = Integer.valueOf(secondArrTime[1]) * 1000 + Integer.valueOf(secondArrTime[0]) * 60 * 1000;
+                                    Log.i(TAG, " arrivalTime[1]=" + arrivalTime[1]);
+                                    String[] secondArrTime = arrivalTime[1].split("\\s+");
+                                    long secondMillisecArrivalTime = 0;
+                                    if (secondArrTime.length == 2) {
+                                        secondArrTime[1] = secondArrTime[1].replaceAll("\\D+", ""); //초
+                                        secondArrTime[0] = secondArrTime[0].replaceAll("\\D+", ""); //분
+                                        if (!secondArrTime[0].isEmpty() && !secondArrTime[1].isEmpty()) {
+                                            secondMillisecArrivalTime = Integer.valueOf(secondArrTime[1]) * 1000 + Integer.valueOf(secondArrTime[0]) * 60 * 1000;
+                                        }
+
+                                    } else if (secondArrTime.length == 1) {
+                                        secondArrTime[0] = secondArrTime[0].replaceAll("\\D+", ""); //초
+                                        if (!secondArrTime[0].isEmpty()) {
+                                            secondMillisecArrivalTime = Integer.valueOf(secondArrTime[0]) * 1000;
+                                        }
                                     }
+                                    //secondDifference = timediff - secondMillisecArrivalTime; // before
+                                    secondDifference = timediff + secondMillisecArrivalTime; //after
+                                }
 
-                                } else if (secondArrTime.length == 1) {
-                                    secondArrTime[0] = secondArrTime[0].replaceAll("\\D+", ""); //초
-                                    if(!secondArrTime[0].isEmpty()) {
-                                        secondMillisecArrivalTime = Integer.valueOf(secondArrTime[0]) * 1000;
+                                if (!mRouteArray[Integer.valueOf(where) - 1][3].contains("Empty")) {
+                                    /* 목적지 까지 소요 시간 */
+                                    requiredtime = Integer.valueOf(mRouteArray[Integer.valueOf(where) - 1][3]) * 60 * 1000;
+                                }
+
+                                Log.i(TAG, " mSchedInfo.get_leadtimetotal()=" + mSchedInfo.get_leadtimetotal());
+                                String[] leadtimetotal = mSchedInfo.get_leadtimetotal().split("\\s+");
+                                long millisecondLeadTimeTotal = 0;
+                                if (leadtimetotal.length == 2) {
+                                    if (!leadtimetotal[0].isEmpty() && !leadtimetotal[1].isEmpty()) {
+                                        millisecondLeadTimeTotal = Integer.valueOf(leadtimetotal[0]) * 60 * 60 * 1000 + Integer.valueOf(leadtimetotal[1]) * 60 * 1000;
+                                    }
+                                } else {
+                                    if (!leadtimetotal[0].isEmpty()) {
+                                        millisecondLeadTimeTotal = Integer.valueOf(leadtimetotal[0]) * 60 * 1000;
                                     }
                                 }
-                                secondDifference = timediff - secondMillisecArrivalTime;
-                            }
 
-                            Log.i(TAG, " mSchedInfo.get_leadtimetotal()=" + mSchedInfo.get_leadtimetotal());
-                            String[] leadtimetotal = mSchedInfo.get_leadtimetotal().split("\\s+");
-                            long millisecondLeadTimeTotal = 0;
-                            if(leadtimetotal.length == 2) {
-                                if(!leadtimetotal[0].isEmpty() && !leadtimetotal[1].isEmpty()) {
-                                    millisecondLeadTimeTotal = Integer.valueOf(leadtimetotal[0]) * 60 * 60 * 1000 + Integer.valueOf(leadtimetotal[1]) * 60 * 1000;
-                                }
-                            } else {
-                                if(!leadtimetotal[0].isEmpty()) {
-                                    millisecondLeadTimeTotal = Integer.valueOf(leadtimetotal[0]) * 60 * 1000;
-                                }
-                            }
-
+                            /* before */
+                            /*
                             String[] routeTime = mRouteArray[Integer.valueOf(where) - 1][1].split("\\s+");
                             Log.i(TAG, " mRouteArray[Integer.valueOf(where) - 1][1]=" +  mRouteArray[Integer.valueOf(where) - 1][1]);
                             long millisecondRouteTime = 0;
@@ -519,33 +554,31 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                     millisecondRouteTime = Integer.valueOf(routeTime[0]) * 1000;
                                 }
                             }
+                            */
+                            /* before */
+                                long millisecondRouteTime = 0;
+                            /* 경유지의 소요 시간 합 */
+                                for (int m = 0; m < Integer.valueOf(where); m++) {
+                                    String[] routeTime = mRouteArray[m][1].split("\\s+");
+                                    Log.i(TAG, " mRouteArray[" + m + "][1]=" + mRouteArray[Integer.valueOf(where) - 1][1]);
 
-                            if(!mRouteArray[Integer.valueOf(where) - 1][2].contains("Empty")) {
-                                if (secondDifference > (millisecondLeadTimeTotal - millisecondRouteTime)) {
-                                    tvReport.append("You are not late. Keep walking");
-                                    if (enableTTS) {
-                                        Log.i(TAG, "TTS Client");
-                                        //ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
-                                        ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
-                                        ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                                        try {
-                                            sleep(SLEEP_SHORT);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                    if (routeTime.length == 2) {
+                                        if (!routeTime[0].isEmpty() && !routeTime[1].isEmpty()) {
+                                            millisecondRouteTime = millisecondRouteTime + Integer.valueOf(routeTime[0]) * 60 * 1000 + Integer.valueOf(routeTime[1]) * 1000;
+                                        }
+                                    } else {
+                                        if (!routeTime[0].isEmpty()) {
+                                            millisecondRouteTime = millisecondRouteTime + Integer.valueOf(routeTime[0]) * 1000;
                                         }
                                     }
+                                }
 
-
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                        tvReport.append(System.lineSeparator());
-                                        tvReport.append(System.lineSeparator());
-                                    }
-                                    svReport.fullScroll(View.FOCUS_DOWN);
-                                } else {
-                                    if (firstDifference > (millisecondLeadTimeTotal - millisecondRouteTime)) {
+                                if (requiredtime != 0) {
+                                    if(timediff > requiredtime) {
                                         tvReport.append("You are not late. Keep walking");
                                         if (enableTTS) {
                                             Log.i(TAG, "TTS Client");
+                                            //ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                             ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                             ttsClient.play();       //세팅된 문자열을 합성하여 재생.
                                             try {
@@ -555,110 +588,172 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                             }
                                         }
 
+
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                             tvReport.append(System.lineSeparator());
                                             tvReport.append(System.lineSeparator());
                                         }
                                         svReport.fullScroll(View.FOCUS_DOWN);
                                     } else {
-                                        tvReport.append("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);
-                                        if(enableTTS) {
-                                            Log.i(TAG, "TTS Client");
-                                            ttsClient.setSpeechText( mRouteArray[ROUTE1 - 1][0] + "으로 뛰어 가셔야 합니다. ");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
-                                            ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                                            try {
-                                                sleep(SLEEP_SHORT);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
+                                            tvReport.append("You need to run toward destination ");
+                                            if (enableTTS) {
+                                                Log.i(TAG, "TTS Client");
+                                                ttsClient.setSpeechText("목적지로 뛰어 가셔야 합니다. ");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                try {
+                                                    sleep(SLEEP_SHORT);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                tvReport.append(System.lineSeparator());
+                                                tvReport.append(System.lineSeparator());
+                                            }
+                                            svReport.fullScroll(View.FOCUS_DOWN);
+                                    }
+                                } else {
+                                    if (!mRouteArray[Integer.valueOf(where) - 1][2].contains("Empty")) {
+                                        if (secondDifference > (millisecondLeadTimeTotal - millisecondRouteTime)) {
+                                            tvReport.append("You are not late. Keep walking");
+                                            if (enableTTS) {
+                                                Log.i(TAG, "TTS Client");
+                                                //ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                try {
+                                                    sleep(SLEEP_SHORT);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+
+
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                tvReport.append(System.lineSeparator());
+                                                tvReport.append(System.lineSeparator());
+                                            }
+                                            svReport.fullScroll(View.FOCUS_DOWN);
+                                        } else {
+                                            if (firstDifference > (millisecondLeadTimeTotal - millisecondRouteTime)) {
+                                                tvReport.append("You are not late. Keep walking");
+                                                if (enableTTS) {
+                                                    Log.i(TAG, "TTS Client");
+                                                    ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                    ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                    try {
+                                                        sleep(SLEEP_SHORT);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                    tvReport.append(System.lineSeparator());
+                                                    tvReport.append(System.lineSeparator());
+                                                }
+                                                svReport.fullScroll(View.FOCUS_DOWN);
+                                            } else {
+                                                tvReport.append("You need to run toward " + mRouteArray[Integer.valueOf(where) - 1][0]);
+                                                if (enableTTS) {
+                                                    Log.i(TAG, "TTS Client");
+                                                    ttsClient.setSpeechText(mRouteArray[ROUTE1 - 1][0] + "으로 뛰어 가셔야 합니다. ");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                    ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                    try {
+                                                        sleep(SLEEP_SHORT);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                    tvReport.append(System.lineSeparator());
+                                                    tvReport.append(System.lineSeparator());
+                                                }
+                                                svReport.fullScroll(View.FOCUS_DOWN);
                                             }
                                         }
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                            tvReport.append(System.lineSeparator());
-                                            tvReport.append(System.lineSeparator());
+                                    } else {
+                                        if (timediff > millisecondRouteTime) {
+                                            tvReport.append("You are not late. Keep walking");
+                                            if (enableTTS) {
+                                                ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅
+                                                ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                try {
+                                                    sleep(SLEEP_SHORT);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                tvReport.append(System.lineSeparator());
+                                                tvReport.append(System.lineSeparator());
+                                            }
+                                            svReport.fullScroll(View.FOCUS_DOWN);
+                                        } else {
+                                            tvReport.append("You need to run toward " + mRouteArray[Integer.valueOf(where) - 1][0]);
+                                            if (enableTTS) {
+                                                Log.i(TAG, "TTS Client");
+                                                ttsClient.setSpeechText(mRouteArray[ROUTE1 - 1][0] + "으로 뛰어 가셔야 합니다. ");   //뉴톤톡 하고자 하는 문자열을 미리 세팅
+                                                ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                                try {
+                                                    sleep(SLEEP_SHORT);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                                tvReport.append(System.lineSeparator());
+                                                tvReport.append(System.lineSeparator());
+                                            }
+                                            svReport.fullScroll(View.FOCUS_DOWN);
                                         }
-                                        svReport.fullScroll(View.FOCUS_DOWN);
                                     }
                                 }
+
                             } else {
-                                if (timediff > millisecondRouteTime) {
-                                    tvReport.append("You are not late. Keep walking");
-                                    if(enableTTS) {
-                                        ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅
-                                        ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                                        try {
-                                            sleep(SLEEP_SHORT);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                        tvReport.append(System.lineSeparator());
-                                        tvReport.append(System.lineSeparator());
-                                    }
-                                    svReport.fullScroll(View.FOCUS_DOWN);
-                                } else {
-                                    tvReport.append("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);
-                                    if(enableTTS) {
-                                        Log.i(TAG, "TTS Client");
-                                        ttsClient.setSpeechText( mRouteArray[ROUTE1 - 1][0] + "으로 뛰어 가셔야 합니다. ");   //뉴톤톡 하고자 하는 문자열을 미리 세팅
-                                        ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                                        try {
-                                            sleep(SLEEP_SHORT);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                        tvReport.append(System.lineSeparator());
-                                        tvReport.append(System.lineSeparator());
-                                    }
-                                    svReport.fullScroll(View.FOCUS_DOWN);
+                                isRoute[Integer.valueOf(where) - 1][CLOSE] = false;
+                                isRoute[Integer.valueOf(where) - 1][FAR] = true;
+                            }
+                            Intent removerouteintent = new Intent();
+                            PendingIntent premoverouteintent = PendingIntent.getBroadcast(ReportActivity.this, (Integer.valueOf(where) - 1), removerouteintent, 0);
+                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                return;
+                            }
+                            locationManager.removeProximityAlert(premoverouteintent);
+                        }
+
+                    } else if (where.equals(WHERE_DESTINATION)) {
+                        if (close) {
+                            isDestination[CLOSE] = true;
+                            isDestination[FAR] = false;
+                            tvReport.append("You are arrived in the destination");
+                            if (enableTTS) {
+                                Log.i(TAG, "TTS Client");
+                                ttsClient.setSpeechText("목적지에 도착하였습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                ttsClient.play();       //세팅된 문자열을 합성하여 재생.
+                                try {
+                                    sleep(SLEEP_SHORT);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
                             }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                tvReport.append(System.lineSeparator());
+                                tvReport.append(System.lineSeparator());
+                            }
+                            svReport.fullScroll(View.FOCUS_DOWN);
 
                         } else {
-                            isRoute[Integer.valueOf(where) - 1][CLOSE] = false;
-                            isRoute[Integer.valueOf(where) - 1][FAR] = true;
+                            isDestination[CLOSE] = false;
+                            isDestination[FAR] = true;
                         }
-                        Intent removerouteintent = new Intent();
-                        PendingIntent premoverouteintent = PendingIntent.getBroadcast(ReportActivity.this, (Integer.valueOf(where) - 1), removerouteintent, 0);
-                        if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            return;
-                        }
-                        locationManager.removeProximityAlert(premoverouteintent);
-                    }
-
-                }else if (where.equals(WHERE_DESTINATION)) {
-                    if (close) {
-                        isDestination[CLOSE] = true;
-                        isDestination[FAR] = false;
-                        tvReport.append("You are arrived in the destination");
-                        if(enableTTS) {
-                            Log.i(TAG, "TTS Client");
-                            ttsClient.setSpeechText("목적지에 도착하였습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
-                            ttsClient.play();       //세팅된 문자열을 합성하여 재생.
-                            try {
-                                sleep(SLEEP_SHORT);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            tvReport.append(System.lineSeparator());
-                            tvReport.append(System.lineSeparator());
-                        }
-                        svReport.fullScroll(View.FOCUS_DOWN);
-
-                    } else {
-                        isDestination[CLOSE] = false;
-                        isDestination[FAR] = true;
                     }
                 }
             }
@@ -714,7 +809,18 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                 }
                 locationManager.removeProximityAlert(premoveintent);
 
-                if (isDeparture[CLOSE]) {
+                Location loc1 = new Location("");
+                loc1.setLatitude(mDeparture[0]);
+                loc1.setLongitude(mDeparture[1]);
+
+                Location loc2 = new Location("");
+                loc2.setLatitude(currentLocation.getLatitude());
+                loc2.setLongitude(currentLocation.getLongitude());
+
+                float distanceInMeters = loc1.distanceTo(loc2);
+                Log.i(TAG, "Distance from departure to current location=" + distanceInMeters);
+
+                if (isDeparture[CLOSE] || distanceInMeters < 300) {
                     tvReport.append("You are in the departure now");
                     if (enableTTS) {
                         Log.i(TAG, "TTS Client");
@@ -753,6 +859,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                     isDeparture[CLOSE] = false;
                 } else {
                     //tvReport.append("You are not now in the departure");
+
                     tvReport.append("If you are not in the departure now,");
                     if (enableTTS) {
                         Log.i(TAG, "TTS Client");
@@ -970,6 +1077,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                     int currhour = cal.get(Calendar.HOUR);
                                     //24 hour format
                                     int currhourofday = cal.get(Calendar.HOUR_OF_DAY);
+                                    Log.i(TAG, "currhourofday=" + currhourofday + "currminute=" + currminute);
 
                                     int timediff = 0;
                                     int timediffmin = 0;
@@ -1055,7 +1163,6 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                             millisecondLeadTimeTotal = Integer.valueOf(leadtimetotal[0]) * 60 * 1000;
                                         }
                                     }
-
                                     String[] routeTime = mRouteArray[Integer.valueOf(where) - 1][1].split("\\s+");
                                     Log.i(TAG, " mRouteArray[Integer.valueOf(where) - 1][1]=" + mRouteArray[Integer.valueOf(where) - 1][1]);
                                     long millisecondRouteTime = 0;
@@ -1074,7 +1181,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                             tvReport.append("You are not late. Keep walking");
                                             if(enableTTS) {
                                                 Log.i(TAG, "TTS Client");
-                                                ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                                 ttsClient.play();       //세팅된 문자열을 합성하여 재생.
                                                 try {
                                                     sleep(SLEEP_SHORT);
@@ -1092,7 +1199,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                                 tvReport.append("You are not late. Keep walking");
                                                 if(enableTTS) {
                                                     Log.i(TAG, "TTS Client");
-                                                    ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                    ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                                     ttsClient.play();       //세팅된 문자열을 합성하여 재생.
                                                     try {
                                                         sleep(SLEEP_SHORT);
@@ -1106,7 +1213,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                                 }
                                                 svReport.fullScroll(View.FOCUS_DOWN);
                                             } else {
-                                                tvReport.append("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);
+                                                tvReport.append("You need to run toward " + mRouteArray[Integer.valueOf(where) - 1][0]);
                                                 if(enableTTS) {
                                                     Log.i(TAG, "TTS Client");
                                                     //ttsClient.setSpeechText("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
@@ -1129,7 +1236,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                         if (timediff > millisecondRouteTime) {
                                             tvReport.append("You are not late. Keep walking");
                                             if(enableTTS) {
-                                                ttsClient.setSpeechText("You are not late. Keep walking");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
+                                                ttsClient.setSpeechText("걸어가셔도 늦지 않습니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                                 ttsClient.play();       //세팅된 문자열을 합성하여 재생.
                                                 try {
                                                     sleep(SLEEP_SHORT);
@@ -1143,7 +1250,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                             }
                                             svReport.fullScroll(View.FOCUS_DOWN);
                                         } else {
-                                            tvReport.append("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);
+                                            tvReport.append("You need to run toward " + mRouteArray[Integer.valueOf(where) - 1][0]);
                                             if(enableTTS) {
                                                 //ttsClient.setSpeechText("You need to run toward " + mRouteArray[ROUTE1 - 1][0]);   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
                                                 ttsClient.setSpeechText( mRouteArray[ROUTE1 - 1][0] + "으로 뛰어 가셔야 합니다");   //뉴톤톡 하고자 하는 문자열을 미리 세팅.
@@ -1183,7 +1290,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                             }
                         }
                         /* test code */
-                        if (false) {
+                        if (true) {
                             Handler h = new Handler();
                             h.postDelayed(new Runnable() {
                                 @Override
@@ -1196,7 +1303,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                         @Override
                                         public void run() {
                                             Intent myintent = new Intent(PROX_ALERT_INTENT);
-                                            myintent.putExtra("where", WHERE_ROUTE5);
+                                            myintent.putExtra("where", WHERE_ROUTE3);
                                             sendBroadcast(myintent);
                                             Handler h3 = new Handler();
                                             h3.postDelayed(new Runnable() {
@@ -1206,15 +1313,15 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                                     myintent.putExtra("where", WHERE_DESTINATION);
                                                     sendBroadcast(myintent);
                                                 }
-                                            }, 10000);
+                                            }, 5000);
                                         }
-                                    }, 10000);
+                                    },5000);
                                 }
-                            }, 10000);
+                            },5000);
                         }
                     }
-                //}, 10000); // 출발지 10초 후 출발여부 확인
-                }, 1200000); // 출발지 20분 후 출발여부 확인
+                }, 10000); // 출발지 10초 후 출발여부 확인
+               // }, 1200000); // 출발지 20분 후 출발여부 확인
             }
         }, 10000); // 출발지 위치 확인
 
@@ -1293,7 +1400,7 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                 do {
                     i++;
                     locinfo = db.getEachRowOfLocationDatabase(i);
-
+                    //Log.i(TAG, "locinfo.get_address()=" + locinfo.get_address() + "destionation=" + mSchedInfo.get_destination());
                     if (locinfo.get_address() != null && locinfo.get_address().contains(mSchedInfo.get_destination())) {
                         mDestination[0] = Double.parseDouble(locinfo.get_pointy());
                         mDestination[1] = Double.parseDouble(locinfo.get_pointx());
@@ -1508,5 +1615,10 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
             }
         }, mIntentFilter);
         */
+    }
+
+    private boolean isLeadingDigit(final String value){
+        final char c = value.charAt(0);
+        return (c >= '0' && c <= '9');
     }
 }

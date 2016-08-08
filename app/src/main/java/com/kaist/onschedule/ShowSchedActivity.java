@@ -5,15 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CalendarView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +18,6 @@ import android.widget.Toast;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,14 +50,14 @@ public class ShowSchedActivity extends AppCompatActivity {
                             public void onDismiss(DialogInterface dialog) {
                                 // Setup the list view
                                 final ListView newsEntryListView = (ListView) findViewById(R.id.schedLv);
-                                final NewsEntryAdapter newsEntryAdapter = new NewsEntryAdapter(getBaseContext(), R.layout.news_entry_list_item);
-                                newsEntryListView.setAdapter(newsEntryAdapter);
+                                final ShowSchedListEntryAdapter showSchedListEntryAdapter = new ShowSchedListEntryAdapter(getBaseContext(), R.layout.news_entry_list_item);
+                                newsEntryListView.setAdapter(showSchedListEntryAdapter);
                                 newsEntryListView.setItemsCanFocus(false);
                                 newsEntryListView.setTextFilterEnabled(true);
 
                                 // Populate the list, through the adapter
                                 for(final SchedInfo entry : getNewsEntries()) {
-                                    newsEntryAdapter.add(entry);
+                                    showSchedListEntryAdapter.add(entry);
                                 }
                             }
                         });
@@ -165,14 +161,14 @@ public class ShowSchedActivity extends AppCompatActivity {
 
         // Setup the list view
         final ListView newsEntryListView = (ListView) findViewById(R.id.schedLv);
-        final NewsEntryAdapter newsEntryAdapter = new NewsEntryAdapter(this, R.layout.news_entry_list_item);
-        newsEntryListView.setAdapter(newsEntryAdapter);
+        final ShowSchedListEntryAdapter showSchedListEntryAdapter = new ShowSchedListEntryAdapter(this, R.layout.news_entry_list_item);
+        newsEntryListView.setAdapter(showSchedListEntryAdapter);
         newsEntryListView.setItemsCanFocus(false);
         newsEntryListView.setTextFilterEnabled(true);
 
         // Populate the list, through the adapter
         for(final SchedInfo entry : getNewsEntries()) {
-            newsEntryAdapter.add(entry);
+            showSchedListEntryAdapter.add(entry);
         }
 
     }
@@ -182,14 +178,14 @@ public class ShowSchedActivity extends AppCompatActivity {
         super.onResume();
         // Setup the list view
         final ListView newsEntryListView = (ListView) findViewById(R.id.schedLv);
-        final NewsEntryAdapter newsEntryAdapter = new NewsEntryAdapter(this, R.layout.news_entry_list_item);
-        newsEntryListView.setAdapter(newsEntryAdapter);
+        final ShowSchedListEntryAdapter showSchedListEntryAdapter = new ShowSchedListEntryAdapter(this, R.layout.news_entry_list_item);
+        newsEntryListView.setAdapter(showSchedListEntryAdapter);
         newsEntryListView.setItemsCanFocus(false);
         newsEntryListView.setTextFilterEnabled(true);
 
         // Populate the list, through the adapter
         for(final SchedInfo entry : getNewsEntries()) {
-            newsEntryAdapter.add(entry);
+            showSchedListEntryAdapter.add(entry);
         }
     }
 

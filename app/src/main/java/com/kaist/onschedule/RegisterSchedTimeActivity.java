@@ -310,8 +310,8 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
                     cal.add(Calendar.MINUTE, -((Integer.valueOf(mleadTimeTotal) + 20) % 60));
                 }
 
-                Log.i(TAG, "hour=" + cal.get(Calendar.HOUR_OF_DAY) + " min=" + cal.get(Calendar.MINUTE));
-                setAlarm(Integer.valueOf(d[0]), Integer.valueOf(d[1]) - 1, Integer.valueOf(d[2]), tp.getCurrentHour(), tp.getCurrentMinute());
+                Log.i(TAG, "year=" + Integer.valueOf(d[0]) + " month=" + (Integer.valueOf(d[1]) - 1) + " day=" + Integer.valueOf(d[2]) + " hour=" + cal.get(Calendar.HOUR_OF_DAY) + " min=" +  cal.get(Calendar.MINUTE));
+                setAlarm(Integer.valueOf(d[0]), Integer.valueOf(d[1]) - 1, Integer.valueOf(d[2]), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
                 break;
 
             case R.id.btnMyLocation:
@@ -467,7 +467,7 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
                     routeName.setHint("Name Without 역");
                     leadTime.setHint("Lead Time For Route\n(min second)");
                     nextStation.setHint("If Route is Subway Station,\nWrite Next Station Name Without 역");
-                    transport.setHint("If Route is Bus Station,\nWrite Bus #");
+                    transport.setHint("If the last Route\nWrite required time to destination");
                     layout.addView(routeName);
                     layout.addView(leadTime);
                     layout.addView(nextStation);

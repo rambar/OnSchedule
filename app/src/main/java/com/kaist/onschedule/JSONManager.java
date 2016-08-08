@@ -1,12 +1,8 @@
 package com.kaist.onschedule;
 
-import android.app.Activity;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -40,7 +36,7 @@ public class JSONManager {
     private static Context mContext;
     private static final String TAG = "kaist_JSON";
     private static String[] mPoint = {"",""};
-    private static PointXY point;
+    private static LocationPointXY point;
     private static SubwayInfo subwayInfo;
     private static SubwayInfo[] subwayInfoArray;
     public static String mPointX = "";
@@ -49,7 +45,7 @@ public class JSONManager {
 
     public JSONManager(Context c) {
         mContext = c;
-        point = new PointXY();
+        point = new LocationPointXY();
         subwayInfo = new SubwayInfo(0);
     }
 
@@ -310,7 +306,7 @@ public class JSONManager {
                 subwayInfoArray[i].setArvlMsg2(String.valueOf(((JSONObject) tempObj).get("arvlMsg2")));
                 subwayInfoArray[i].setArvlMsg3(String.valueOf(((JSONObject) tempObj).get("arvlMsg3")));
                 subwayInfoArray[i].setArvlMsg3(String.valueOf(((JSONObject) tempObj).get("updnLine")));
-                if (i == 0) {
+                //if (i == 0) {
 
                     /*
                     subwayInfo.setStatnTid(String.valueOf(((JSONObject) tempObj).get("statnTid")));
@@ -335,7 +331,7 @@ public class JSONManager {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                }
+                //}
 
                 /*
                 subwayInfo.setStatnTid(String.valueOf(((JSONObject) tempObj).get("statnTid")));
