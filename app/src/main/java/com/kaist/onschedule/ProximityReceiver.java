@@ -34,6 +34,7 @@ public abstract class ProximityReceiver extends BroadcastReceiver {
     public Context mContext;//Context of calling BroadCast Receiver
     private String bidId;   //Hold the value of bid Id
 
+    public ProximityReceiver() {}
     public ProximityReceiver(Context context) {
         mContext = context;
     }
