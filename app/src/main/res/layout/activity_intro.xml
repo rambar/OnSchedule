@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+
+    android:paddingTop="30dp"
+    android:paddingBottom="150dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="OnSchedule"
+        android:textSize="@dimen/abc_action_bar_default_height_material" />
+
+    <ImageView
+        android:layout_width="@dimen/abc_action_bar_stacked_tab_max_width"
+        android:layout_height="@dimen/abc_action_bar_stacked_tab_max_width"
+        android:id="@+id/imageView"
+        android:background="@drawable/lauchimage"
+        android:layout_marginTop="50dp" />
+
+</LinearLayout>

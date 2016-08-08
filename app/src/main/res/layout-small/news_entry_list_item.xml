@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!-- Title of the news entry -->
+    <TextView
+        android:id="@+id/news_entry_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <!-- Subtitle contains author and date -->
+    <TextView
+        android:id="@+id/news_entry_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="12sp" />
+
+</LinearLayout>

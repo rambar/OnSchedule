@@ -1,0 +1,1 @@
+include ':app', ':libDaumMapAndroid', ':json-simple-1.1.1', ':httpclient-4.5.2', ':httpcore-4.4.4', ':daum-speech-openapi-3.0'
