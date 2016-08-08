@@ -1,9 +1,7 @@
 package com.kaist.onschedule;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,8 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.speech.tts.TextToSpeech;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,11 +28,7 @@ import net.daum.mf.speech.api.TextToSpeechClient;
 import net.daum.mf.speech.api.TextToSpeechListener;
 import net.daum.mf.speech.api.TextToSpeechManager;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
 
 import static java.lang.Thread.sleep;
 
@@ -355,12 +347,12 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                     } while (!subwaydb.isGetDBFinish());
                                     i = 0;
 
-                                    JSONManager json = new JSONManager(getBaseContext());
+                                    JSONInterface json = new JSONSubwayManager(getBaseContext());
                                     SubwayInfo[] subwayInfoArray;
                                     //matcher = pattern.matcher(mRouteArray[selection][0]);
                                     //json.getJSONDATA(mRouteArray[selection][2], false);
                                     json.getJSONDATA(mRouteArray[Integer.valueOf(where) - 1][0], false);
-                                    subwayInfoArray = json.getSubwayJSONInfo();
+                                    subwayInfoArray = json.getTransportationJSONInfo();
 
 
                                     String updn = "";
@@ -1007,12 +999,12 @@ public class ReportActivity extends AppCompatActivity implements TextToSpeechLis
                                         i++;
                                     } while (!subwaydb.isGetDBFinish());
 
-                                    JSONManager json = new JSONManager(getBaseContext());
+                                    JSONInterface json = new JSONSubwayManager(getBaseContext());
                                     SubwayInfo[] subwayInfoArray;
                                     //matcher = pattern.matcher(mRouteArray[selection][0]);
                                     //json.getJSONDATA(mRouteArray[selection][2], false);
                                     json.getJSONDATA(mRouteArray[Integer.valueOf(where) - 1][0], false);
-                                    subwayInfoArray = json.getSubwayJSONInfo();
+                                    subwayInfoArray = json.getTransportationJSONInfo();
                                     int k = 0;
 
                                     String[] arrivalTime = {"", "", "", ""}; // 몇 분 몇 초 후

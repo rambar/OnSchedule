@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,12 +14,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -34,7 +30,6 @@ import android.widget.Toast;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,7 +81,7 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
             public void onLocationChanged(Location location) {
                 currentLocation = location;
                 Log.i(TAG, "Latitude=" + String.valueOf(location.getLatitude()) + " Longitude=" + String.valueOf(location.getLongitude()));
-                final JSONManager j = new JSONManager(getBaseContext());
+                final JSONInterface j = new JSONSubwayManager(getBaseContext());
                 j.getJSONDATA(null, true, String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
                 if (selectDeparture) {
                     etDepart.setText(j.getAddress());
@@ -238,21 +233,21 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
                     break;
                 }
                 /* JSON Data 처리 */
-                JSONManager j = new JSONManager(this);
+                JSONInterface jsonInterface = new JSONSubwayManager(this);
 
                 for (int i = 0; i < 2; i++) {
                     if (i == 0) {
                         matcher = pattern.matcher(departure);
-                        j.getJSONDATA(departure, matcher.find(), null, null);
+                        jsonInterface.getJSONDATA(departure, matcher.find(), null, null);
 
-                        pointCoord[i] = j.getPointY();
-                        pointCoord[i + 1] = j.getPointX();
+                        pointCoord[i] = jsonInterface.getPointY();
+                        pointCoord[i + 1] = jsonInterface.getPointX();
                     } else {
                         matcher = pattern.matcher(destination);
-                        j.getJSONDATA(destination, matcher.find(), null, null);
+                        jsonInterface.getJSONDATA(destination, matcher.find(), null, null);
 
-                        pointCoord[2 * i] = j.getPointY();
-                        pointCoord[2 * i + 1] = j.getPointX();
+                        pointCoord[2 * i] = jsonInterface.getPointY();
+                        pointCoord[2 * i + 1] = jsonInterface.getPointX();
                     }
                 }
 
@@ -480,7 +475,7 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
                 alertDialog.setPositiveButton("Set",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                JSONManager json = new JSONManager(getBaseContext());
+                                JSONInterface jsonInterface = new JSONSubwayManager(getBaseContext());
                                 Log.i(TAG, routeName.getText().toString());
                                 if(v.getId() == R.id.btnTotalLeadTime) {
                                     mleadTimeTotal = leadTimeTotal.getText().toString();
@@ -496,15 +491,15 @@ public class RegisterSchedTimeActivity extends AppCompatActivity implements View
                                     Matcher matcher;
                                     if (!routeName.getText().toString().isEmpty()) {
                                         /* JSON Data 처리 */
-                                        JSONManager j = new JSONManager(getBaseContext());
+                                        JSONInterface jsonInterface2 = new JSONSubwayManager(getBaseContext());
 
                                         /* 지하철만 고려함. 버스 정류장은 추후 작업 필요*/
                                         matcher = pattern.matcher(mRouteArray[selection][0] + "역");
-                                        j.getJSONDATA(mRouteArray[selection][0] + "역", matcher.find(), null, null);
-                                        json.getJSONDATA(mRouteArray[selection][0], false);
+                                        jsonInterface2.getJSONDATA(mRouteArray[selection][0] + "역", matcher.find(), null, null);
+                                        jsonInterface2.getJSONDATA(mRouteArray[selection][0], false);
                                     }
                                     if(!nextStation.getText().toString().isEmpty() || !nextStation.getText().toString().equals("Empty")) {
-                                        json.getJSONDATA(mRouteArray[selection][2], false);
+                                        jsonInterface.getJSONDATA(mRouteArray[selection][2], false);
                                     }
                                 }
                             }
